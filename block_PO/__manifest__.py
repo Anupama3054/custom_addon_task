@@ -14,6 +14,5 @@
     'depends': ['base', 'mail', 'account','purchase'],
     'data': [
         "views/res_partner.xml",
-        "views/block_PO_menus.xml",
     ]
 }
