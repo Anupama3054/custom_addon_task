@@ -14,7 +14,7 @@
     'depends': ['base', 'mail', 'account'],
     'data': ["security/security.xml",
              "security/ir.model.access.csv",
-             "security/company_level_record_rule.xml",
+             "security/res_company_record_rule.xml",
              "data/rentlease_sequence.xml",
              "data/ir_cron_data.xml",
              "data/paylate_mail_template.xml",
