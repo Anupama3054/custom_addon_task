@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--form view-->
+    <record id="property_rentlease_view_form" model="ir.ui.view">
+        <field name="name">rental.lease.view.form</field>
+        <field name="model">rental.lease.management</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_open_invoice_wizard"
+                            string="Create Invoice"
+                            type="object" class="oe_highlight"
+                            invisible="status == 'Draft'"/>
+                    <button name="draft" type="object" string="Draft"
+                            class="oe_highlight" invisible="status == 'Draft'"/>
+                    <button name="confirm" type="object" string="Confirm"
+                            class="oe_highlight" invisible="status != 'Draft'"/>
+                    <button name="approve" type="object" string="Approve" groups="property_management.group_property_manager"
+                            class="oe_highlight" invisible="status != 'To Approve'" />
+                    <button name="close" type="object" string="Close"
+                            class="oe_highlight"
+                            invisible="status == 'Closed'"/>
+                    <button name="returned" type="object" string="Return"
+                            class="oe_highlight"
+                            invisible="status == 'Returned'"/>
+                    <button name="expired" type="object" string="Expire"
+                            class="oe_highlight"
+                            invisible="status != 'Draft'"/>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="INVOICE PAID"
+                            bg_color="bg-success" invisible="not is_paid"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_invoices"
+                                icon="fa-pencil-square-o"
+                                type="object" class="oe_stat_button"
+                                invisible="invoice_count==0">
+                            <div class="o_stat_info">
+                                <field name="invoice_count"
+                                       class="o_stat_value"/>
+                                <span class="o_stat_text">Invoices
+                                </span>
+                            </div>
+                        </button>
+                    </div>
+                    <group>
+                        <h1>
+                            <field name="rent_lease_id" readonly="1"/>
+                        </h1>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="property" widget="many2many_tags"/>
+                            <field name="type"/>
+                            <field name="tenant_id"/>
+                            <field name="amount"/>
+                            <field name="total_amount"/>
+                        </group>
+                        <group>
+                            <field name="start_date" widget="daterange"
+                                   string="Start date"
+                                   class="oe_inline"/>
+                            <field name="end_date" widget="daterange"
+                                   string="End date"
+                                   class="oe_inline"/>
+                            <field name="due_date" widget="daterange" string="Due date" class="oe_inline"/>
+                            <field name="number_of_days" readonly="1"/>
+                            <field name="company"/>
+                            <field name="document_id" widget="many2one_binary"/>
+
+
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+
+
+    </record>
+
+
+    <!--    list view-->
+
+    <record id="property_rentlease_view_list" model="ir.ui.view">
+        <field name="name">rental.lease.view.list</field>
+        <field name="model">rental.lease.management</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="rent_lease_id" readonly="1"/>
+                <field name="property" widget="many2many_tags"/>
+                <field name="type"/>
+                <field name="tenant_id"/>
+                <field name="amount"/>
+                <field name="total_amount"/>
+                <field name="start_date" widget="daterange"
+                       string="Start date"
+                       class="oe_inline"/>
+                <field name="end_date" widget="daterange"
+                       string="End date"
+                       class="oe_inline"/>
+                <field name="number_of_days" readonly="1"/>
+                <field name="company"/>
+                <field name="status"/>
+            </list>
+        </field>
+
+    </record>
+
+    <!--    search view  -->
+    <record id="rent_lease_search" model="ir.ui.view">
+        <field name="name">property.rentlease.view.search</field>
+        <field name="model">rental.lease.management</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter name="type" string="Rent"
+                        domain="[('type','=','Rent')]"/>
+                <filter name="type" string="Lease"
+                        domain="[('type','=','Lease')]"/>
+                <group name="group_by_type">
+                    <filter name="type" string="Type"
+                            context="{'group_by':'type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!--    window-->
+    <record id="action_property_rentlease" model="ir.actions.act_window">
+        <field name="name">Rent/Lease</field>
+        <field name="res_model">rental.lease.management</field>
+        <field name="view_mode">list,form,search</field>
+        <field name="help" type="html">
+            <p>create your first rent/lease agreement</p>
+        </field>
+    </record>
+</odoo>
+

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--form view-->
+    <record id="property_management_view_form" model="ir.ui.view">
+        <field name="name">property.management.view.form</field>
+        <field name="model">property.management</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="status" widget="statusbar"
+                           options="{'clickable':1}"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_rent_lease_records"
+                                type="object" class="oe_stat_button">
+                            <div class="o_stat_info">
+                                <field name="record_count"
+                                       class="o_stat_value"/>
+                                <span class="o_stat_text">Rent/Lease Record
+                                </span>
+                            </div>
+                        </button>
+                    </div>
+                    <group>
+                        <h1>
+                            <field name="property_ref_id" readonly="1"/>
+                        </h1>
+                        <field name="image" widget="image" class="oe_avatar"
+                               nolabel="1"/>
+                    </group>
+
+                    <group>
+                        <group>
+                            <span name="address">
+                                <span>
+                                    <b>Address</b>
+                                </span>
+                            </span>
+                            <div>
+                                <field name="house_name"
+                                       placeholder="house name"/>
+                                <field name="street" placeholder="Street"/>
+                                <field name="state_id" placeholder="State"/>
+                                <div name="country">
+                                    <field name="country_id"
+                                           placeholder="Country"/>
+                                </div>
+                            </div>
+                            <field name="built_date"/>
+                            <field name="can_be_sold"/>
+                        </group>
+
+                        <group>
+                            <field name="facility_name"
+                                   widget="many2many_tags"/>
+                            <field name="owner_id"
+                                   options="{'no_create': False, 'no_open': False}"/>
+                            <field name="legal_amount"/>
+                            <field name="rent"/>
+                            <field name="active"/>
+                            <field name="company_id"/>
+                        </group>
+
+                        <notebook>
+                            <page string="Description" name="description_page">
+                                <field name="description"
+                                       placeholder="add description.."/>
+                            </page>
+                        </notebook>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!--    .............list view...........-->
+
+    <record id="property_management_view_list" model="ir.ui.view">
+        <field name="name">property.management.view.list</field>
+        <field name="model">property.management</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="property_ref_id"/>
+                <field name="status"/>
+                <field name="house_name" placeholder="house name"/>
+                <field name="street" placeholder="Street"/>
+                <field name="state_id" placeholder="State"/>
+                <field name="country_id" placeholder="Country"/>
+                <field name="built_date"/>
+                <field name="can_be_sold"/>
+                <field name="active"/>
+                <field name="facility_name" widget="many2many_tags"/>
+                <field name="owner_id"/>
+                <field name="legal_amount"/>
+                <field name="rent"/>
+                <field name="status"/>
+            </list>
+        </field>
+    </record>
+
+
+    <!--    search view      -->
+    <record id="property_details_view_search" model="ir.ui.view">
+        <field name="name">property.management.view.search</field>
+        <field name="model">property.management</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter name="can_be_sold" string="Can be sold"
+                        domain="[('can_be_sold','=',True)]"/>
+                <filter name="active" string="Archived"
+                        domain="[('active','=',False)]"/>
+                <group name="group_by">
+                    <filter name="state_id" string="State"
+                            context="{'group_by':'state_id'}"/>
+                    <filter name="country_id" string="Country"
+                            context="{'group_by':'country_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!--window action-->
+    <record id="action_property_management" model="ir.actions.act_window">
+        <field name="name">Properties</field>
+        <field name="res_model">property.management</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p>create your first property</p>
+        </field>
+    </record>
+</odoo>
+

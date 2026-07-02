@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="rent_lease_demo_1" model="property.management">
+            <field name="property_ref_id">PR003</field>
+            <field name="legal_amount">1000</field>
+        </record>
+        <record id="rent_lease_demo_2" model="property.management">
+            <field name="property_ref_id">PR005</field>
+            <field name="legal_amount">6000</field>
+            <field name="status">Sold</field>
+        </record>
+    </data>
+</odoo>

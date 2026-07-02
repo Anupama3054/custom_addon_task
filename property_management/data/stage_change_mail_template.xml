@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="email_template" model="mail.template">
+            <field name="name">Email template</field>
+            <field name="model">rental.lease.management</field>
+            <field name="subject">state set to {{object.status}}</field>
+            <field name="email_from">{{user.email}}</field>
+            <field name="email_to">{{object.tenant_id.email}}</field>
+            <field name="body_html" type="html">
+                <div>
+                    <p>
+                        Dear <t t-out="object.tenant_id.name"/>,
+                        <br/>
+                        <br/>
+                        Your rent/lease record status changed to
+                        <t t-out="ctx.get('context',{}).get('status','')"/>
+                        <br/>
+                        <br/>
+                        Mitchel Admin
+                    </p>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,30 @@
+# -*- coding: utf-8 -*-
+{
+    'name': "Property_Management",
+    'version': "19.0.1.0",
+    'license': "LGPL-3",
+    'author': "Anupama_P",
+    'category': "property",
+    'summary': "A module for property management",
+    'description': "This manages all aspects of property management",
+    'sequence': -10,
+    'application': True,
+    'installable': True,
+    'auto_install': True,
+    'depends': ['base', 'mail', 'account'],
+    'data': ["security/security.xml",
+             "security/ir.model.access.csv",
+             "security/company_level_record_rule.xml",
+             "data/rentlease_sequence.xml",
+             "data/ir_cron_data.xml",
+             "data/paylate_mail_template.xml",
+             "data/stage_change_mail_template.xml",
+             "views/res_partner.xml",
+             "demo/demo.xml",
+             "views/facilities.xml",
+             "views/rental_lease_management_views.xml",
+             "data/property_sequence.xml",
+             "views/property_management_views.xml",
+             "views/property_management_menus.xml"
+             ]
+}

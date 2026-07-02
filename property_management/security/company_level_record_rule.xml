@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="company_level_record_rule" model="ir.rule">
+        <field name="name">Company level record view</field>
+        <field name="model_id" ref="model_rental_lease_management"/>
+        <field name="domain_force">[('company', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4,ref('property_management.group_property_user')),(4,ref('property_management.group_property_manager'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record id="company_level_record_rule_1" model="ir.rule">
+        <field name="name">Company level record view</field>
+        <field name="model_id" ref="model_property_management"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4,ref('property_management.group_property_user')),(4,ref('property_management.group_property_manager'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+        <field name="active" eval="True"/>
+    </record>
+
+</odoo>
