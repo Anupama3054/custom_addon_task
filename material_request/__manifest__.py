@@ -13,6 +13,7 @@
     'auto_install': True,
     'depends': ['base', 'mail', 'account', 'purchase'],
     'data': [
+        "security/security.xml",
         "security/ir.model.access.csv",
         "views/material_request.xml",
         "views/material_request_menus.xml",

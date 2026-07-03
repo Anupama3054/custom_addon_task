@@ -1,47 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <odoo>
-        <data>
-            <!-- FORM VIEW -->
-            <record id="material_request_form" model="ir.ui.view">
-                <field name="name">Material Request Form</field>
-                <field name="model">material.req.ref</field>
-                <field name="arch" type="xml">
-                    <form>
-                        <sheet>
-                            <group>
-                            <group>
-                                <field name="employee_id"/>
-                            </group>
-                            <group>
-                                <field name="date"/>
-                            </group>
-                            </group>
-                            <notebook>
-                                <page string="Order Lines">
-                                    <field name="line_ids">
-                                        <list string="Order Lines"
-                                              editable="bottom">
-                                            <field name="product_id"/>
-                                            <field name="prod_source"/>
-                                            <field name="price_unit"/>
-                                            <field name="product_qty"/>
-                                        </list>
-                                    </field>
-                                </page>
-                            </notebook>
-                        </sheet>
-                    </form>
-                </field>
-            </record>
-        </data>
-    </odoo>
+    <!-- FORM VIEW -->
+    <record id="material_request_form" model="ir.ui.view">
+        <field name="name">Material Request Form</field>
+        <field name="model">material.req.ref</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="status" widget="statusbar"
+                           options="{'clickable':0}"/>
+                    <button name="action_submit"
+                            string="Submit"
+                            type="object" groups="material_request.group_requisition_user" class="oe_highlight" invisible="status != 'Draft'"/>
+                    <button name="action_approve"
+                            string="Approve"
+                            type="object" groups="material_request.group_requisition_manager,material_request.group_requisition_head" class="oe_highlight"/>
+                    <button name="action_reject"
+                            string="Reject"
+                            type="object" groups="material_request.group_requisition_head" class="oe_highlight" invisible="status == 'Rejected'"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Order Lines">
+                            <field name="line_ids">
+                                <list string="Order Lines"
+                                      editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="prod_source"/>
+                                    <field name="price_unit"/>
+                                    <field name="product_qty"/>
+                                    <field name="vendor_id"
+                                           domain="[('product_tmpl_id', '=', product_id)]"
+                                           invisible="prod_source != 'Purchase Order'"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!--            List view-->
+
+    <record id="material_request_list" model="ir.ui.view">
+        <field name="name">Material Request List</field>
+        <field name="model">material.req.ref</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="employee_id"/>
+                <field name="date"/>
+            </list>
+        </field>
+    </record>
+
+
     <!--window-->
 
     <record id="action_material_request" model="ir.actions.act_window">
         <field name="name">Requests</field>
         <field name="res_model">material.req.ref</field>
-        <field name="view_mode">form</field>
+        <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p>create your first Request</p>
         </field>
