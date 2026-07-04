@@ -11,7 +11,7 @@
     'application': True,
     'installable': True,
     'auto_install': True,
-    'depends': ['base', 'mail', 'account', 'purchase'],
+    'depends': ['base', 'mail', 'account', 'purchase','stock'],
     'data': [
         "security/security.xml",
         "security/ir.model.access.csv",

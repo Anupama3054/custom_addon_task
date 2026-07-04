@@ -11,15 +11,43 @@
                            options="{'clickable':0}"/>
                     <button name="action_submit"
                             string="Submit"
-                            type="object" groups="material_request.group_requisition_user" class="oe_highlight" invisible="status != 'Draft'"/>
+                            type="object"
+                            groups="material_request.group_requisition_user"
+                            class="oe_highlight" invisible="status != 'Draft'"/>
                     <button name="action_approve"
                             string="Approve"
-                            type="object" groups="material_request.group_requisition_manager,material_request.group_requisition_head" class="oe_highlight"/>
+                            type="object"
+                            groups="material_request.group_requisition_manager,material_request.group_requisition_head"
+                            class="oe_highlight"/>
                     <button name="action_reject"
                             string="Reject"
-                            type="object" groups="material_request.group_requisition_head" class="oe_highlight" invisible="status == 'Rejected'"/>
+                            type="object"
+                            groups="material_request.group_requisition_head"
+                            class="oe_highlight"
+                            invisible="status == 'Rejected'"/>
+
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_internal_transfers"
+                                type="object" class="oe_stat_button">
+                            <div class="o_stat_info">
+                                <field name="internal_transfers_count"
+                                       class="o_stat_value"/>
+                                <span class="o_stat_text">Internal Transfers
+                                </span>
+                            </div>
+                        </button>
+                        <button name="action_open_po"
+                                type="object" class="oe_stat_button">
+                            <div class="o_stat_info">
+                                <field name="po_count"
+                                       class="o_stat_value"/>
+                                <span class="o_stat_text">Purchase Orders
+                                </span>
+                            </div>
+                        </button>
+                    </div>
                     <group>
                         <group>
                             <field name="employee_id"/>
@@ -35,6 +63,14 @@
                                       editable="bottom">
                                     <field name="product_id"/>
                                     <field name="prod_source"/>
+                                    <field name="vendor_id"
+                                           widget="many2many_tags"/>
+                                    <field name="location_id"
+                                           domain="[('usage','=','internal')]"
+                                           readonly="prod_source == 'Purchase Order'"/>
+                                    <field name="location_dest_id"
+                                           domain="[('usage','=','internal')]"
+                                           readonly="prod_source == 'Purchase Order'"/>
                                     <field name="price_unit"/>
                                     <field name="product_qty"/>
                                     <field name="vendor_id"
@@ -48,6 +84,7 @@
             </form>
         </field>
     </record>
+
 
     <!--            List view-->
 
