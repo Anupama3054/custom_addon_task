@@ -2,95 +2,168 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
+
 class MyCustomModel(models.Model):
+    """This class is for creating the form for material request."""
     _name = 'material.req.ref'
     _description = 'Material request reference'
+    _rec_name = "material_request_id"
 
-    employee_id = fields.Many2one('res.partner', string="Employee")
+    employee_id = fields.Many2one('res.partner', string="Employee",
+                                  required=True)
     status = fields.Selection(
         [("Draft", "Draft"), ("To Approve by Manager", "To Approve by Manager"),
-         ("To Approve by Head", "To Approve by Head"),("Rejected", "Rejected"),
+         ("To Approve by Head", "To Approve by Head"), ("Rejected", "Rejected"),
          ("Confirmed", "Confirmed")], default="Draft", tracking=True)
+
     date = fields.Datetime(string="Date", default=fields.Date.today())
     line_ids = fields.One2many('material.request', 'order_id',
                                string='Order Lines')
-    po_id=fields.One2many('purchase.order','material_id',string='Purchase Order')
-    po_count=fields.Integer(string="Purchase Order Count",compute="_compute_po_count")
-    transfer_id=fields.One2many("stock.picking","internal_id",string="Internal Transfer")
-    internal_transfers_count=fields.Integer(string="Internal Transfer Count",compute="_compute_internal_transfers_count")
+    po_id = fields.One2many('purchase.order', 'material_id',
+                            string='Purchase Order')
+    po_count = fields.Integer(string="Purchase Order Count",
+                              compute="_compute_po_count")
+    transfer_id = fields.One2many("stock.picking", "internal_id",
+                                  string="Internal Transfer")
+    internal_transfers_count = fields.Integer(string="Internal Transfer Count",
+                                              compute="_compute_internal_transfers_count")
+    material_request_id = fields.Char(string="Material request id",
+                                      required=True,
+                                      copy=False, readonly=True,
+                                      default=lambda self: 'New')
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        """ This function is used to create a sequence for each form.Before saving
+        the form,the sequence will be set to 'New' and on saving,the sequence
+        will be automatically updated based on the prefix,padding and increment
+        we already specified."""
+        for vals in vals_list:
+            if vals.get('material_request_id', 'New') == 'New':
+                vals['material_request_id'] = self.env[
+                                                  'ir.sequence'].next_by_code(
+                    'request_seq') or 'New'
+        return super(MyCustomModel, self).create(vals_list)
 
     @api.depends('line_ids')
     def action_approve(self):
-        if self.status=="Draft":
-            raise UserError("Only records in 'To Approve' stage can be approved!")
+        """This function is for approving the records. and for creating POs and
+        internal transfers while approval."""
+        if self.status == "Draft":
+            raise UserError(
+                "Only records in 'To Approve' stage can be approved!")
         elif self.status == "To Approve by Manager" and self.env.user.has_group(
                 'material_request.group_requisition_manager'):
-            self.status="To Approve by Head"
+            self.status = "To Approve by Head"
         elif self.status == "To Approve by Manager" and not self.env.user.has_group(
                 'material_request.group_requisition_manager'):
-            raise UserError("You can only perform this operation after manager approval!")
-        elif self.status=="To Approve by Head" and self.env.user.has_group(
+            raise UserError(
+                "You can only perform this operation after manager approval!")
+        elif self.status == "To Approve by Head" and self.env.user.has_group(
                 'material_request.group_requisition_head'):
-            self.status="Confirmed"
+            self.status = "Confirmed"
         else:
             pass
 
-        if not self.env.user.has_group(
-                'property_management.group_property_head') and self.status == 'Confirmed':
-            po=[]
-            for record in self:
-                if record.line_ids.prod_source=='Purchase Order':
-                    for rec in record.line_ids:
-                        po.append((0,0,{
-                            'name':rec.product_id.name,
-                            'product_qty':rec.product_qty,
-                            'price_unit':rec.price_unit,
-                        }))
-                    purchase=self.env['purchase.order'].create({
-                        'partner_id':rec.vendor_id.id,
-                        'material_id':self.id,
-                        'order_line':po,
-                    })
-            return{
-                'type': 'ir.actions.act_window',
-                'name': 'Purchase Order',
-                'res_model': 'purchase.order',
-                'res_id': purchase.id,
-                'view_mode': 'form',
-                'target': 'current'
-            }
+        for record in self:
+            purchase_lines = record.line_ids.filtered(
+                lambda a: a.prod_source == 'Purchase Order')
+            internal_lines = record.line_ids.filtered(
+                lambda b: b.prod_source == 'Internal Transfer')
+
+            if purchase_lines:
+                for rec in purchase_lines:
+                    if rec.product_id:
+                        vendors = rec.product_id.seller_ids.mapped(
+                            'partner_id')
+                        v_list = vendors.ids
+                        for vendor in v_list:
+                            if (not self.env.user.has_group(
+                                    'property_management.group_property_head')
+                                    and self.status == 'Confirmed'):
+                                po = [(0, 0, {
+                                      'name': rec.product_id.display_name,
+                                    'product_id': rec.product_id.id,
+                                    'product_qty': rec.product_qty,
+                                    'price_unit': rec.price_unit,
+                                })]
+
+                                self.env['purchase.order'].create({
+                                    'partner_id': vendor,
+                                    'material_id': record.id,
+                                    'order_line': po,
+                                    'origin': self.id,
+                                })
+
+            if internal_lines:
+                picking_type = self.env['stock.picking.type'].search([
+                    ('code', '=', 'internal')])
+
+                if (not self.env.user.has_group(
+                        'property_management.group_property_head')
+                        and self.status == 'Confirmed'):
+
+                    for rec in internal_lines:
+                        picking = self.env['stock.picking'].create({
+                            'partner_id': record.employee_id.id,
+                            'picking_type_id': picking_type.id,
+                            'location_id': rec.location_id.id,
+                            'location_dest_id': rec.location_dest_id.id,
+                            'internal_id': record.id,
+                            'origin': self.id,
+
+                        })
+
+                        self.env['stock.move'].create({
+                            'product_id': rec.product_id.id,
+                            'product_uom_qty': rec.product_qty,
+                            'picking_id': picking.id,
+
+                        })
 
     def action_submit(self):
+        """This function is for changing the status while clicking button"""
         self.status = "To Approve by Manager"
 
     def action_reject(self):
-        if self.status=="To Approve by Manager":
-            raise UserError("You can only perform this operation after manager approval!")
+        """This function is for rejecting the request"""
+        if self.status == "To Approve by Manager":
+            raise UserError(
+                "You can only perform this operation after manager approval!")
         else:
             self.status = "Rejected"
 
     def _compute_po_count(self):
+        """This function is for computing the count of PO records"""
         for record in self:
             po_count = len(record.po_id)
             record.po_count = po_count
 
     def action_open_po(self):
-        return{
+        """This function is for opening the PO records"""
+        return {
             "name": "PO",
             "type": "ir.actions.act_window",
             "view_mode": "list,form",
             "res_model": "purchase.order",
-            "domain": [("material_id", "=", self.po_id)]
+            "domain": [("origin", "=", self.id)]
         }
 
+    @api.depends('transfer_id')
     def _compute_internal_transfers_count(self):
+        """This function is for counting  the number of internal transfers"""
         for record in self:
-            internal_transfers_count=len(record.transfer_id)
-            record.internal_transfers_count=internal_transfers_count
-
+            internal_transfer_count = len(record.transfer_id)
+            record.internal_transfers_count = internal_transfer_count
 
     def action_open_internal_transfers(self):
-        pass
+        """This function is for opening the internal transfers"""
+        return {
+            "name": "Internal",
+            "type": "ir.actions.act_window",
+            "view_mode": "list,form",
+            "res_model": "stock.picking",
+            "domain": [("origin", "=", self.id)]
+        }
 
 

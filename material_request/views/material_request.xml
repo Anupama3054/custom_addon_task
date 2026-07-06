@@ -49,6 +49,11 @@
                         </button>
                     </div>
                     <group>
+                        <h1>
+                            <field name="material_request_id" readonly="1"/>
+                        </h1>
+                    </group>
+                    <group>
                         <group>
                             <field name="employee_id"/>
                         </group>
@@ -63,8 +68,8 @@
                                       editable="bottom">
                                     <field name="product_id"/>
                                     <field name="prod_source"/>
-                                    <field name="vendor_id"
-                                           widget="many2many_tags"/>
+<!--                                    <field name="vendor_id"-->
+<!--                                           widget="many2many_tags"/>-->
                                     <field name="location_id"
                                            domain="[('usage','=','internal')]"
                                            readonly="prod_source == 'Purchase Order'"/>
@@ -73,9 +78,6 @@
                                            readonly="prod_source == 'Purchase Order'"/>
                                     <field name="price_unit"/>
                                     <field name="product_qty"/>
-                                    <field name="vendor_id"
-                                           domain="[('product_tmpl_id', '=', product_id)]"
-                                           invisible="prod_source != 'Purchase Order'"/>
                                 </list>
                             </field>
                         </page>
@@ -93,8 +95,10 @@
         <field name="model">material.req.ref</field>
         <field name="arch" type="xml">
             <list>
+                <field name="material_request_id"/>
                 <field name="employee_id"/>
                 <field name="date"/>
+                <field name="status" widget="badge"/>
             </list>
         </field>
     </record>

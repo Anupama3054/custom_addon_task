@@ -2,6 +2,7 @@
 from odoo import models, fields, api
 
 class PurchaseOrder(models.Model):
+    """To inherit purchase.order and add required fields"""
     _inherit = "purchase.order"
 
     material_id = fields.Many2one('material.req.ref',string='material_id')

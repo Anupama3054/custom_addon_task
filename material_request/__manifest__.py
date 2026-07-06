@@ -17,6 +17,5 @@
         "security/ir.model.access.csv",
         "views/material_request.xml",
         "views/material_request_menus.xml",
-
-    ]
-}
+        "data/material_sequence.xml",
+    ]}
