@@ -46,24 +46,16 @@ class MyCustomModel(models.Model):
         return super(MyCustomModel, self).create(vals_list)
 
     @api.depends('line_ids')
-    def action_approve(self):
+    def action_approve_manager(self):
         """This function is for approving the records. and for creating POs and
         internal transfers while approval."""
-        if self.status == "Draft":
-            raise UserError(
-                "Only records in 'To Approve' stage can be approved!")
-        elif self.status == "To Approve by Manager" and self.env.user.has_group(
-                'material_request.group_requisition_manager'):
-            self.status = "To Approve by Head"
-        elif self.status == "To Approve by Manager" and not self.env.user.has_group(
-                'material_request.group_requisition_manager'):
-            raise UserError(
-                "You can only perform this operation after manager approval!")
-        elif self.status == "To Approve by Head" and self.env.user.has_group(
-                'material_request.group_requisition_head'):
-            self.status = "Confirmed"
-        else:
-            pass
+        self.status = "To Approve by Head"
+
+    @api.depends('line_ids')
+    def action_approve_head(self):
+        """This function is for approving the records. and for creating POs and
+        internal transfers while approval."""
+        self.status = "Confirmed"
 
         for record in self:
             purchase_lines = record.line_ids.filtered(
@@ -72,54 +64,49 @@ class MyCustomModel(models.Model):
                 lambda b: b.prod_source == 'Internal Transfer')
 
             if purchase_lines:
+                vendor_list = {}
                 for rec in purchase_lines:
                     if rec.product_id:
                         vendors = rec.product_id.seller_ids.mapped(
                             'partner_id')
-                        v_list = vendors.ids
-                        for vendor in v_list:
-                            if (not self.env.user.has_group(
-                                    'property_management.group_property_head')
-                                    and self.status == 'Confirmed'):
-                                po = [(0, 0, {
-                                      'name': rec.product_id.display_name,
-                                    'product_id': rec.product_id.id,
-                                    'product_qty': rec.product_qty,
-                                    'price_unit': rec.price_unit,
-                                })]
-
-                                self.env['purchase.order'].create({
-                                    'partner_id': vendor,
-                                    'material_id': record.id,
-                                    'order_line': po,
-                                    'origin': self.id,
-                                })
+                        for vendor in vendors:
+                            if vendor.id not in vendor_list:
+                                vendor_list[vendor.id] = []
+                            vendor_list[vendor.id].append((0, 0, {
+                                'name': rec.product_id.display_name,
+                                'product_id': rec.product_id.id,
+                                'product_qty': rec.product_qty,
+                                'price_unit': rec.price_unit,
+                            }))
+                for vendor_id, order_line in vendor_list.items():
+                    self.env['purchase.order'].create({
+                        'partner_id': vendor_id,
+                        'material_id': record.id,
+                        'origin': self.id,
+                        'order_line': order_line,
+                    })
 
             if internal_lines:
                 picking_type = self.env['stock.picking.type'].search([
                     ('code', '=', 'internal')])
+                for rec in internal_lines:
+                    picking = self.env['stock.picking'].create({
+                        'partner_id': record.employee_id.id,
+                        'picking_type_id': picking_type.id,
+                        'location_id': rec.location_id.id,
+                        'location_dest_id': rec.location_dest_id.id,
+                        'internal_id': record.id,
+                        'origin': self.id,
 
-                if (not self.env.user.has_group(
-                        'property_management.group_property_head')
-                        and self.status == 'Confirmed'):
+                    })
 
-                    for rec in internal_lines:
-                        picking = self.env['stock.picking'].create({
-                            'partner_id': record.employee_id.id,
-                            'picking_type_id': picking_type.id,
-                            'location_id': rec.location_id.id,
-                            'location_dest_id': rec.location_dest_id.id,
-                            'internal_id': record.id,
-                            'origin': self.id,
+                    self.env['stock.move'].create({
+                        'product_id': rec.product_id.id,
+                        'product_uom_qty': rec.product_qty,
+                        'location_final_id': rec.location_dest_id.id,
+                        'picking_id': picking.id,
 
-                        })
-
-                        self.env['stock.move'].create({
-                            'product_id': rec.product_id.id,
-                            'product_uom_qty': rec.product_qty,
-                            'picking_id': picking.id,
-
-                        })
+                    })
 
     def action_submit(self):
         """This function is for changing the status while clicking button"""
@@ -127,11 +114,7 @@ class MyCustomModel(models.Model):
 
     def action_reject(self):
         """This function is for rejecting the request"""
-        if self.status == "To Approve by Manager":
-            raise UserError(
-                "You can only perform this operation after manager approval!")
-        else:
-            self.status = "Rejected"
+        self.status = "Rejected"
 
     def _compute_po_count(self):
         """This function is for computing the count of PO records"""
@@ -149,7 +132,6 @@ class MyCustomModel(models.Model):
             "domain": [("origin", "=", self.id)]
         }
 
-    @api.depends('transfer_id')
     def _compute_internal_transfers_count(self):
         """This function is for counting  the number of internal transfers"""
         for record in self:
@@ -165,5 +147,3 @@ class MyCustomModel(models.Model):
             "res_model": "stock.picking",
             "domain": [("origin", "=", self.id)]
         }
-
-

@@ -33,8 +33,9 @@ class PropertyManagement(models.Model):
     facility_name = fields.Many2many("property.facilities",
                                      string="Facilities")
     company_id = fields.Many2one('res.company', string="Company",
-                              default=lambda self: self.env.user.company_id.id)
-    active=fields.Boolean(string="Active", default=True)
+                                 default=lambda
+                                     self: self.env.user.company_id.id)
+    active = fields.Boolean(string="Active", default=True)
 
     @api.model_create_multi
     def create(self, vals_list):

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- FORM VIEW -->
+
+    <!--    form view-->
+
     <record id="material_request_form" model="ir.ui.view">
         <field name="name">Material Request Form</field>
         <field name="model">material.req.ref</field>
@@ -14,23 +16,28 @@
                             type="object"
                             groups="material_request.group_requisition_user"
                             class="oe_highlight" invisible="status != 'Draft'"/>
-                    <button name="action_approve"
+                    <button name="action_approve_manager"
                             string="Approve"
                             type="object"
-                            groups="material_request.group_requisition_manager,material_request.group_requisition_head"
-                            class="oe_highlight"/>
+                            groups="material_request.group_requisition_manager"
+                            class="oe_highlight" invisible="status != 'To Approve by Manager'"/>
+                    <button name="action_approve_head"
+                            string="Approve"
+                            type="object"
+                            groups="material_request.group_requisition_head"
+                            class="oe_highlight" invisible="status != 'To Approve by Head'"/>
                     <button name="action_reject"
                             string="Reject"
                             type="object"
                             groups="material_request.group_requisition_head"
                             class="oe_highlight"
-                            invisible="status == 'Rejected'"/>
-
+                            invisible="status != 'To Approve by Head'"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_open_internal_transfers"
-                                type="object" class="oe_stat_button">
+                                type="object" class="oe_stat_button"
+                                invisible="internal_transfers_count==0">
                             <div class="o_stat_info">
                                 <field name="internal_transfers_count"
                                        class="o_stat_value"/>
@@ -39,7 +46,8 @@
                             </div>
                         </button>
                         <button name="action_open_po"
-                                type="object" class="oe_stat_button">
+                                type="object" class="oe_stat_button"
+                                invisible="po_count==0">
                             <div class="o_stat_info">
                                 <field name="po_count"
                                        class="o_stat_value"/>
@@ -63,7 +71,7 @@
                     </group>
                     <notebook>
                         <page string="Order Lines">
-                            <field name="line_ids">
+                            <field name="line_ids" readonly="status not in ['Draft']">
                                 <list string="Order Lines"
                                       editable="bottom">
                                     <field name="product_id"/>
@@ -71,7 +79,7 @@
 <!--                                    <field name="vendor_id"-->
 <!--                                           widget="many2many_tags"/>-->
                                     <field name="location_id"
-                                           domain="[('usage','=','internal')]"
+                                           domain="[('id', 'in', stock_location_ids)]"
                                            readonly="prod_source == 'Purchase Order'"/>
                                     <field name="location_dest_id"
                                            domain="[('usage','=','internal')]"
