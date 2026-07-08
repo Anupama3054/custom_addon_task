@@ -7,4 +7,5 @@ class OwnerRecords(models.Model):
     required fields to it."""
     _inherit = 'res.partner'
 
-    property=fields.One2many('property.management','owner_id',string='Property')
+    property = fields.One2many('property.management', 'owner_id',
+                               string='Property')

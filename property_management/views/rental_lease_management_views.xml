@@ -15,8 +15,10 @@
                             class="oe_highlight" invisible="status == 'Draft'"/>
                     <button name="confirm" type="object" string="Confirm"
                             class="oe_highlight" invisible="status != 'Draft'"/>
-                    <button name="approve" type="object" string="Approve" groups="property_management.group_property_manager"
-                            class="oe_highlight" invisible="status != 'To Approve'" />
+                    <button name="approve" type="object" string="Approve"
+                            groups="property_management.group_property_manager"
+                            class="oe_highlight"
+                            invisible="status != 'To Approve'"/>
                     <button name="close" type="object" string="Close"
                             class="oe_highlight"
                             invisible="status == 'Closed'"/>
@@ -64,7 +66,8 @@
                             <field name="end_date" widget="daterange"
                                    string="End date"
                                    class="oe_inline"/>
-                            <field name="due_date" widget="daterange" string="Due date" class="oe_inline"/>
+                            <field name="due_date" widget="daterange"
+                                   string="Due date" class="oe_inline"/>
                             <field name="number_of_days" readonly="1"/>
                             <field name="company"/>
                             <field name="document_id" widget="many2one_binary"/>
@@ -102,7 +105,7 @@
                        class="oe_inline"/>
                 <field name="number_of_days" readonly="1"/>
                 <field name="company"/>
-                <field name="status"/>
+                <field name="status" widget="badge"/>
             </list>
         </field>
 

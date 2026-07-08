@@ -95,7 +95,7 @@
                 <field name="owner_id"/>
                 <field name="legal_amount"/>
                 <field name="rent"/>
-                <field name="status"/>
+                <field name="status" widget="badge"/>
             </list>
         </field>
     </record>
