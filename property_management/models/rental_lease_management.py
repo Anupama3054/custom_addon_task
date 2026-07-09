@@ -5,7 +5,7 @@ from dateutil.utils import today
 from docutils.nodes import target
 from openpyxl.cell import read_only
 
-from odoo import fields, models, api
+from odoo import fields, models, api,Command
 from datetime import timedelta
 from odoo.exceptions import UserError
 
@@ -148,11 +148,13 @@ class RentorLeaseManagement(models.Model):
             invoice_line = []
             for record in self:
                 for rec in record.property:
-                    invoice_line.append((0, 0, {
-                        'name': rec.property_ref_id,
-                        'quantity': 1,
-                        'price_unit': record.amount,
-                    }))
+                    invoice_line.append(
+                        Command.create({
+                            'name': rec.property_ref_id,
+                            'quantity': 1,
+                            'price_unit': record.amount,
+                        })
+                    )
                 draft_invoice = self.env['account.move'].search([
                     ('move_type', '=', 'out_invoice'),
                     ('lease_id', '=', self.id),
@@ -163,11 +165,12 @@ class RentorLeaseManagement(models.Model):
                     for rec in record.property:
                         draft_invoice.write({
                             'partner_id': self.tenant_id.id,
-                            'invoice_line_ids': [((0, 0, {
+                            'invoice_line_ids': [
+                                Command.create({
                                 'name': rec.property_ref_id,
                                 'quantity': 1,
                                 'price_unit': record.amount,
-                            }))]
+                            })]
                         })
                         invoice = draft_invoice
                 else:

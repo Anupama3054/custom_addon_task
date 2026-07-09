@@ -83,7 +83,6 @@
         <field name="arch" type="xml">
             <list>
                 <field name="property_ref_id"/>
-                <field name="status"/>
                 <field name="house_name" placeholder="house name"/>
                 <field name="street" placeholder="Street"/>
                 <field name="state_id" placeholder="State"/>

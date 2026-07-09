@@ -76,8 +76,6 @@
                                       editable="bottom">
                                     <field name="product_id"/>
                                     <field name="prod_source"/>
-<!--                                    <field name="vendor_id"-->
-<!--                                           widget="many2many_tags"/>-->
                                     <field name="location_id"
                                            domain="[('id', 'in', stock_location_ids)]"
                                            readonly="prod_source == 'Purchase Order'"/>
@@ -95,7 +93,6 @@
         </field>
     </record>
 
-
     <!--            List view-->
 
     <record id="material_request_list" model="ir.ui.view">
@@ -110,7 +107,6 @@
             </list>
         </field>
     </record>
-
 
     <!--window-->
 

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models
 from odoo import Command
+from odoo.exceptions import ValidationError
+import mimetypes
 
 
 class SaleOrder(models.Model):
@@ -8,7 +10,31 @@ class SaleOrder(models.Model):
     required fields to it."""
     _inherit = 'sale.order'
 
+    paid = fields.Boolean(string="Paid", compute='_compute_paid')
+
+    def _action_confirm(self):
+        """To add more actions to be performed while clicking the confirm
+        button."""
+        super()._action_confirm()
+
+        attachments = self.env['ir.attachment'].search([
+            ('res_model', '=', 'sale.order'),
+            ('res_id', '=', self.id),
+        ])
+        mimetypes = (
+            'application/pdf',
+            'image/jpeg'
+        )
+        for record in attachments:
+            mime= record.mimetype
+            if mime not in mimetypes:
+                raise ValidationError("Only pdf and jpg files are supported")
+
+        if self.message_attachment_count == 0:
+            raise ValidationError("Add attachment before confirming!!")
+
     def action_register_payment(self):
+        print(self.message_attachment_count)
         for record in self:
             invoice_line = []
             for rec in record.order_line:
@@ -18,7 +44,6 @@ class SaleOrder(models.Model):
                         'quantity': rec.product_uom_qty,
                         'price_unit': rec.price_unit,
                         'sale_line_ids': [Command.link(rec.id)],
-                        'currency_id': record.currency_id.id,
                     })
                 )
 
@@ -29,6 +54,8 @@ class SaleOrder(models.Model):
                 'invoice_origin': record.name,
                 'currency_id': record.currency_id.id,
             })
+            invoice.action_post()
+
             return {
                 'name': 'Register Payment',
                 'type': 'ir.actions.act_window',
@@ -38,10 +65,14 @@ class SaleOrder(models.Model):
                 'context': {
                     'active_model': 'account.move',
                     'active_ids': invoice.ids,
-                    'default_currency_id': record.currency_id.id,
-                    'default_payment_type': 'inbound',
-                    'default_partner_id': record.partner_id.id,
-                    'default_amount': invoice.amount_residual,
                 }}
 
-
+    @api.depends('invoice_ids.payment_state', 'invoice_ids.state')
+    def _compute_paid(self):
+        for record in self:
+            record.paid = False
+            for rec in record.invoice_ids:
+                if rec.payment_state == 'paid' and rec.state == 'posted':
+                    record.paid = True
+                else:
+                    record.paid = False

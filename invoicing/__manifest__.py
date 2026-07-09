@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Block PO",
+    'name': "invoicing",
     'version': "19.0.1.0.0",
     'license': "LGPL-3",
     'author': "Anupama P",
-    'category': "purchase_order",
-    'summary': "Block PO",
-    'description': "Block PO",
+    'category': "invoicing",
+    'summary': "invoicing",
+    'description': "invoicing",
     'sequence': -10,
     'application': True,
     'installable': True,
     'auto_install': True,
-    'depends': ['base', 'mail', 'account','purchase'],
+    'depends': ['base','account','stock','sale','sale_management'],
     'data': [
-        "views/res_partner.xml",
+        'views/account_move.xml',
     ]
 }
+
+

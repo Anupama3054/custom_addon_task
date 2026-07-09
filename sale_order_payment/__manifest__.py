@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Sale_Order_Payment",
-    'version': "19.0.1.0",
+    'name': "Sale Order Payment",
+    'version': "19.0.1.0.0",
     'license': "LGPL-3",
-    'author': "Anupama_P",
+    'author': "Anupama P",
     'category': "sale_order",
     'summary': "Register payment from sale order",
     'description': "Register payment from sale order",

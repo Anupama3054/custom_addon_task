@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Material_Request",
-    'version': "19.0.1.0",
+    'name': "Material Request",
+    'version': "19.0.1.0.0",
     'license': "LGPL-3",
-    'author': "Anupama_P",
+    'author': "Anupama P",
     'category': "material_request",
     'summary': "Material Request",
     'description': "Material Request",
