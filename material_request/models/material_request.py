@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from addons.web.controllers import domain
 from odoo import api, fields, models
 
 

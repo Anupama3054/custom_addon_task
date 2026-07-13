@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="invoice_view_form_1" model="ir.ui.view">
+        <field name="name">invoice_view_form_1</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_shipping_id']"
+                   position="before">
+                <field name="related_so"
+                       domain="[('invoice_status','=','to invoice'),('id', 'in', so_ids)]"
+                       widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api,Command
-from odoo.exceptions import UserError
+from odoo import models, fields, api, Command
 
 
 class MyCustomModel(models.Model):
@@ -72,13 +71,13 @@ class MyCustomModel(models.Model):
                         for vendor in vendors:
                             if vendor.id not in vendor_list:
                                 vendor_list[vendor.id] = []
-                            vendor_list[vendor.id].append (
+                            vendor_list[vendor.id].append(
                                 Command.create({
                                     'name': rec.product_id.display_name,
                                     'product_id': rec.product_id.id,
                                     'product_qty': rec.product_qty,
                                     'price_unit': rec.price_unit,
-                            }))
+                                }))
                 for vendor_id, order_line in vendor_list.items():
                     self.env['purchase.order'].create({
                         'partner_id': vendor_id,

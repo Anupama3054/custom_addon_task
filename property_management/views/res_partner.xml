@@ -14,7 +14,7 @@
                             <field name="status"/>
                         </list>
                     </field>
-                </page> 
+                </page>
             </xpath>
         </field>
     </record>

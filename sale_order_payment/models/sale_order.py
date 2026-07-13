@@ -2,7 +2,6 @@
 from odoo import api, fields, models
 from odoo import Command
 from odoo.exceptions import ValidationError
-import mimetypes
 
 
 class SaleOrder(models.Model):
@@ -26,15 +25,16 @@ class SaleOrder(models.Model):
             'image/jpeg'
         )
         for record in attachments:
-            mime= record.mimetype
+            mime = record.mimetype
             if mime not in mimetypes:
-                raise ValidationError("Only pdf and jpg files are supported")
+                raise ValidationError("Only pdf and jpeg files are supported")
 
         if self.message_attachment_count == 0:
             raise ValidationError("Add attachment before confirming!!")
 
     def action_register_payment(self):
-        print(self.message_attachment_count)
+        """To open the payment wizard from the sale order itself and also to
+        automatically create the invoice."""
         for record in self:
             invoice_line = []
             for rec in record.order_line:
@@ -69,6 +69,8 @@ class SaleOrder(models.Model):
 
     @api.depends('invoice_ids.payment_state', 'invoice_ids.state')
     def _compute_paid(self):
+        """To compute if the invoice is paid inorder to make the register
+        payment button invisible after payment."""
         for record in self:
             record.paid = False
             for rec in record.invoice_ids:

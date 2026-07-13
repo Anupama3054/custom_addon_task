@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
+from odoo import fields, models
 
-from odoo import fields, models,api
 
 class OwnerRecords(models.Model):
     """This class is used for inheriting the res.partner model and adding the

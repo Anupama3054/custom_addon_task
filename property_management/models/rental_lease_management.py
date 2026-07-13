@@ -1,15 +1,9 @@
 # -*- coding: utf-8 -*-
-from operator import inv
-
-from dateutil.utils import today
-from docutils.nodes import target
-from openpyxl.cell import read_only
-
-from odoo import fields, models, api,Command
+from odoo import fields, models, api, Command
 from datetime import timedelta
 from odoo.exceptions import UserError
 
-from odoo.orm.fields_temporal import Date, Datetime
+from odoo.orm.fields_temporal import Date
 
 
 class RentorLeaseManagement(models.Model):
@@ -74,7 +68,6 @@ class RentorLeaseManagement(models.Model):
             else:
                 record.number_of_days = 0
 
-
     def draft(self):
         """To set the state to draft while clicking the draft button"""
         self.status = 'Draft'
@@ -84,10 +77,10 @@ class RentorLeaseManagement(models.Model):
                                                                      force_send=True,
                                                                      email_values=email_values)
 
-
     def confirm(self):
         """To set the state to confirmed while clicking the confirm button"""
-        if self.env.user.has_group('property_management.group_property_manager'):
+        if self.env.user.has_group(
+                'property_management.group_property_manager'):
             self.status = 'Confirmed'
             template = self.env.ref('property_management.email_template')
             email_values = {'email_to': self.tenant_id.email}
@@ -100,12 +93,10 @@ class RentorLeaseManagement(models.Model):
             template.with_context(context={'status': 'To Approve'}).send_mail(
                 self.id, force_send=True, email_values=email_values)
 
-
     def approve(self):
         """This function is for allowing the manager to approve the rent/lease
         records"""
         self.status = 'Confirmed'
-
 
     def close(self):
         """To set the state to closed while clicking the close button"""
@@ -117,16 +108,14 @@ class RentorLeaseManagement(models.Model):
             force_send=True,
             email_values=email_values)
 
-
     def returned(self):
         """To set the state to returned while clicking the return button"""
         self.status = 'Returned'
         template = self.env.ref('property_management.email_template')
         email_values = {'email_to': self.tenant_id.email}
         template.with_context(context={'status': 'Returned'}).send_mail(self.id,
-                                                                            force_send=True,
-                                                                            email_values=email_values)
-
+                                                                        force_send=True,
+                                                                        email_values=email_values)
 
     def expired(self):
         """To set the state to expired while clicking the expire button"""
@@ -137,13 +126,13 @@ class RentorLeaseManagement(models.Model):
                                                                        force_send=True,
                                                                        email_values=email_values)
 
-
     def action_open_invoice_wizard(self):
         """This function is for opening the invoice form when the create invoice
         button is clicked."""
         if not self.env.user.has_group(
                 'property_management.group_property_manager') and self.status == 'To Approve':
-            raise UserError("Get the record approved by manager to do this action")
+            raise UserError(
+                "Get the record approved by manager to do this action")
         else:
             invoice_line = []
             for record in self:
@@ -167,10 +156,10 @@ class RentorLeaseManagement(models.Model):
                             'partner_id': self.tenant_id.id,
                             'invoice_line_ids': [
                                 Command.create({
-                                'name': rec.property_ref_id,
-                                'quantity': 1,
-                                'price_unit': record.amount,
-                            })]
+                                    'name': rec.property_ref_id,
+                                    'quantity': 1,
+                                    'price_unit': record.amount,
+                                })]
                         })
                         invoice = draft_invoice
                 else:
@@ -190,7 +179,6 @@ class RentorLeaseManagement(models.Model):
                 'target': 'current'
             }
 
-
     def action_open_invoices(self):
         """This function is for opening the related invoices of a rent/lease form
          when the invoice smart button is clicked.if there is any draft invoice
@@ -206,7 +194,6 @@ class RentorLeaseManagement(models.Model):
 
         }
 
-
     @api.depends('invoice_id')
     def _compute_invoice_count(self):
         """This function is for computing the number of rent or lease records
@@ -214,7 +201,6 @@ class RentorLeaseManagement(models.Model):
         for record in self:
             invoice_count = len(record.invoice_id)
             record.invoice_count = invoice_count
-
 
     @api.depends('invoice_id.payment_state')
     def _compute_is_paid(self):
@@ -224,7 +210,6 @@ class RentorLeaseManagement(models.Model):
             record.is_paid = any(
                 inv.state == "posted" and inv.payment_state == "paid" for inv in
                 record.invoice_id)
-
 
     @api.depends('end_date', 'status')
     def _compute_due_date(self):

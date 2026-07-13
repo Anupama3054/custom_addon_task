@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
-from odoo import fields, models,api,Command
+from odoo import fields, models,Command
 
 class AccountMove(models.Model):
+    """This class inherits account.move and automatically fills the invoice
+     lines if transfer is selected and assign button is clicked."""
     _inherit = "account.move"
 
     transfer_id=fields.Many2one('stock.picking',string="Transfers")
 
-    @api.depends('transfer_id','invoice_line_ids')
     def action_fill_invoice_line(self):
+        """To autofill the invoice line with the order lines in the transfer
+        selected while clicking the assign button."""
         invoice_line = []
         self.invoice_line_ids.unlink()
         for record in self.transfer_id.move_ids:
