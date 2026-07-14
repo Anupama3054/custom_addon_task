@@ -7,9 +7,9 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_shipping_id']"
                    position="before">
-                <field name="related_so"
-                       domain="[('invoice_status','=','to invoice'),('id', 'in', so_ids)]"
-                       widget="many2many_tags"/>
+                <field name="related_so_ids"
+                       widget="many2many_tags"
+                domain="[('id','in',allowed_so_ids)]"/>
             </xpath>
         </field>
     </record>
