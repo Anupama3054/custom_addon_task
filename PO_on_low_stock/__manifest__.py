@@ -13,7 +13,6 @@
     'auto_install': True,
     'depends': ['product','base','account','purchase'],
     'data': [
-        'data/ir_cron_data.xml',
         'views/product_template.xml',
     ]
 }

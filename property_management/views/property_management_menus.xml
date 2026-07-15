@@ -9,9 +9,14 @@
     <menuitem id="property_facilities" name="Facility"
               parent="menu_property_management_configuration"
               action="action_property_facility"/>
-    <menuitem id="menu_property_management_rent_or_lease" name="Rent/Lease"
-              parent="menu_property_management_root"
+        <menuitem id="menu_property_management_rentlease" name="Rent/Lease"
+              parent="menu_property_management_root"/>
+    <menuitem id="menu_property_management_rent_or_lease" name="Rent/Lease Record"
+              parent="menu_property_management_rentlease"
               action="action_property_rentlease"/>
+    <menuitem id="menu_property_management_rent_or_lease_report" name="Report"
+              parent="menu_property_management_rentlease"
+              action="action_property_rentlease_report"/>
 </odoo>
 
 

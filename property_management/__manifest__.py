@@ -25,6 +25,8 @@
              "views/rental_lease_management_views.xml",
              "data/property_sequence.xml",
              "views/property_management_views.xml",
-             "views/property_management_menus.xml"
+             "views/rental_lease_management_report.xml",
+             "views/property_management_menus.xml",
+             # "report/ir_actions_report.xml",
              ]
 }
