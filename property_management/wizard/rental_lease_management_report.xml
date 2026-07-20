@@ -1,0 +1,42 @@
+<odoo>
+    <record id="action_property_rentlease_report_wizard_form"
+            model="ir.ui.view">
+        <field name="name">Rent/Lease Report Wizard</field>
+        <field name="model">rental.lease.management.report</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="property_id"/>
+                        <field name="from_date"/>
+                        <field name="to_date"/>
+                        <field name="type"/>
+                    </group>
+                    <group>
+                        <field name="tenant_id"/>
+                        <field name="owner_id"/>
+                        <field name="state"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_create_pdf_report"
+                            string="Print PDF"
+                            type="object" class="oe_highlight"/>
+                    <button name="action_create_xlsx_report"
+                            string="Print XLSX"
+                            type="object" class="oe_highlight"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!--    window-->
+    <record id="action_property_rentlease_report" model="ir.actions.act_window">
+        <field name="name">Rent/Lease Report</field>
+        <field name="res_model">rental.lease.management.report</field>
+        <field name="view_mode">form</field>
+        <field name="view_id"
+               ref="action_property_rentlease_report_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

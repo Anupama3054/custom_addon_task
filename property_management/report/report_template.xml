@@ -9,27 +9,40 @@
                     <h1>Rent/Lease Management PDF Report</h1>
                 </div>
                 <br/>
+                <div class="page">
+                    <div class="oe_structure"/>
+                    <t t-foreach="report" t-as="o">
+                        <p>
+                            Start Date :
+                            <span t-esc="o['start_date']"/>
+                        </p>
+                        <p>
+                            End Date :
+                            <span t-esc="o['end_date']"/>
+                        </p>
+                        <t t-if="data['owner']">
+                            <p>
+                                Owner :
+                                <span t-esc="data['owner']"/>
+                            </p>
+                        </t>
+                    </t>
+                </div>
                 <br/>
                 <table class="table">
                     <tr>
                         <th>Property</th>
-                        <th>From Date</th>
-                        <th>To Date</th>
                         <th>State</th>
                         <th>Tenant</th>
-                        <th>Owner</th>
                         <th>Type</th>
                         <th>Amount</th>
+                        <t t-if="not data['owner']">
+                            <th>Owner</th>
+                        </t>
                     </tr>
                     <tr t-foreach="report" t-as="o">
                         <td>
                             <span t-esc="o['property']"/>
-                        </td>
-                        <td>
-                            <span t-esc="o['start_date']"/>
-                        </td>
-                        <td>
-                            <span t-esc="o['end_date']"/>
                         </td>
                         <td>
                             <span t-esc="o['state']"/>
@@ -38,14 +51,18 @@
                             <span t-esc="o['tenant']"/>
                         </td>
                         <td>
-                            <span t-esc="o['owner']"/>
-                        </td>
-                        <td>
                             <span t-esc="o['type']"/>
                         </td>
                         <td>
                             <span t-esc="o['amount']"/>
                         </td>
+                        <t t-if="not data['owner']">
+                            <td>
+                                <span t-esc="o['owner']"/>
+                            </td>
+                        </t>
+
+
                     </tr>
                 </table>
             </t>

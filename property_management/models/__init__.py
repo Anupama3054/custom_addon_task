@@ -4,5 +4,5 @@ from . import rental_lease_management
 from . import facilities
 from . import account_move
 from . import res_partner
-from . import rental_lease_management_report
+from . import report_abstract
 

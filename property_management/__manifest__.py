@@ -28,7 +28,7 @@
              "views/facilities.xml",
              "views/rental_lease_management_views.xml",
              "views/property_management_views.xml",
-             "views/rental_lease_management_report.xml",
+             "wizard/rental_lease_management_report.xml",
              "views/property_management_menus.xml",
              ]
 }
