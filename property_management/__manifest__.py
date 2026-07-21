@@ -30,5 +30,10 @@
              "views/property_management_views.xml",
              "wizard/rental_lease_management_report.xml",
              "views/property_management_menus.xml",
-             ]
+             ],
+    'assets': {
+        'web.assets_backend': [
+            'property_management/static/src/js/action_manager.js'
+        ],
+    },
 }

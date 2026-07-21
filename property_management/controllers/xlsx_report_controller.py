@@ -2,7 +2,7 @@
 
 import json
 from odoo import http
-from odoo.http import request, content_disposition, serialize_exception
+from odoo.http import content_disposition, request, serialize_exception
 from odoo.tools import html_escape
 
 
@@ -12,7 +12,8 @@ class XLSXReportController(http.Controller):
     def get_report_xlsx(self, model, options, output_format, report_name):
         report_obj = request.env[model].with_user(request.session.uid)
         options = json.loads(options)
-        token = '987654321'
+        token = '54hg-f54gf5-43rt-yh-nb54'
+        print(token)
         try:
             if output_format == 'xlsx':
                 response = request.make_response(
@@ -23,15 +24,14 @@ class XLSXReportController(http.Controller):
                          content_disposition(report_name + '.xlsx'))
                     ]
                 )
-                report_obj.get_xlsx_report(options,response)
-            response.set_cookie('fileToken',token)
+                report_obj.get_xlsx_report(options, response)
+            response.set_cookie('fileToken', token)
             return response
         except Exception as e:
-            se=serialize_exception(e)
-            error={
-                'code':200,
-                'message':'Odoo Server Error',
+            se = serialize_exception(e)
+            error = {
+                'code': 200,
+                'message': 'Odoo Server Error',
                 'data': se
             }
             return request.make_response(html_escape(json.dumps(error)))
-
