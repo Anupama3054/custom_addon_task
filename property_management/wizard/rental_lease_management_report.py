@@ -4,9 +4,7 @@ from odoo import fields, models
 from odoo.exceptions import ValidationError
 import io
 import json
-from datetime import datetime, date
-from dateutil.rrule import rrule, DAILY
-from odoo.tools import date_utils, json_default
+from odoo.tools import json_default
 
 try:
     from odoo.tools.misc import xlsxwriter
@@ -82,6 +80,9 @@ class RentorLeaseManagementReport(models.TransientModel):
             None, data=data)
 
     def action_create_xlsx_report(self):
+        """The action to be performed while clicking the print XLSX button.
+        It raises validation error if from date>to date.this function returns
+        the report action for the report"""
         if self.to_date and self.from_date:
             if self.from_date > self.to_date:
                 raise ValidationError(
@@ -109,6 +110,8 @@ class RentorLeaseManagementReport(models.TransientModel):
             }
 
     def get_xlsx_report(self, data, response):
+        """This function is for passing the values to the xlsx report and to
+        print the report"""
         query = """select pm.property_ref_id as property,rl.start_date as Start_Date,
                 rl.end_date as End_Date,rl.status as State,rp1.name as tenant,
                 rp2.name as owner,rl.amount as Amount,rl.type as Type from 
@@ -141,25 +144,55 @@ class RentorLeaseManagementReport(models.TransientModel):
         self.env.cr.execute(query)
         report = self.env.cr.dictfetchall()
         print(report)
-        records={'report': report}
-        rec=records['report']
-        print(rec)
         if report == []:
             raise ValidationError("No matching datas found!")
         output = io.BytesIO()
-        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        workbook = xlsxwriter.Workbook(output)
         sheet = workbook.add_worksheet('report')
         head = workbook.add_format(
-            {'bold': False, 'font_size': 25, 'align': 'center'}
+            {'font_size': 25, 'align': 'center'}
         )
+        keys = workbook.add_format(
+            {'border': 1, 'font_size': '12px', 'align': 'left', 'bold': True})
         cells = workbook.add_format(
-            {'font_size': '11px', 'align': 'left'})
-        txt = workbook.add_format({'font_size': '10px', 'align': 'left'})
-        sheet.merge_range('I3:L5', 'Rent/Lease Report', head)
-        sheet.merge_range('B8:C8', 'From Date:', cells)
-        sheet.merge_range('D8:E8', data['from_date'], txt)
-        sheet.merge_range('B9:C9', 'To Date:', cells)
-        sheet.merge_range('D9:E9', data['to_date'], txt)
+            {'font_size': '12px', 'align': 'left','bold': True})
+        txt = workbook.add_format({'font_size': '12px', 'align': 'left'})
+        sheet.merge_range('A3:D5', 'Rent/Lease Report', head)
+        sheet.merge_range('A8:B8', 'From Date:', cells)
+        sheet.merge_range('C8:D8', data['from_date'], txt)
+        sheet.merge_range('A9:B9', 'To Date:', cells)
+        sheet.merge_range('C9:D9', data['to_date'], txt)
+        border = workbook.add_format(
+            {'border': 1, 'font_size': '12px', 'align': 'left'})
+        sheet.write(12, 0, 'Sl No',keys)
+        row = 12
+        col = 1
+        for key in report[0]:
+
+
+            if key == "start_date" or key == "end_date":
+                continue
+            else:
+                sheet.write(row, col, key, keys)
+            col += 1
+        row = 12
+        rec_count=0
+        for record in report:
+            rec_count+=1
+            row += 1
+            col = 1
+            for rec in record.values():
+                if str(rec) in (data['from_date'], data['to_date']):
+                    continue
+                else:
+                    sheet.write(row, col, rec, border)
+                    col += 1
+        r=13
+        for i in range(rec_count):
+            i+=1
+            sheet.write(r,0,i,border)
+            r+=1
+
         workbook.close()
         output.seek(0)
         response.stream.write(output.read())

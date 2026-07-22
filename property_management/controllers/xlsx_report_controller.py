@@ -7,13 +7,16 @@ from odoo.tools import html_escape
 
 
 class XLSXReportController(http.Controller):
+    """XLSX Report Controller"""
+
     @http.route('/xlsx_reports', type='http', auth='user', methods=['POST'],
                 csrf=False)
     def get_report_xlsx(self, model, options, output_format, report_name):
+        """XLSX Report.It is the file responsible for sending the
+        generated xlsx file from odoo server to user's browser."""
         report_obj = request.env[model].with_user(request.session.uid)
         options = json.loads(options)
         token = '54hg-f54gf5-43rt-yh-nb54'
-        print(token)
         try:
             if output_format == 'xlsx':
                 response = request.make_response(
