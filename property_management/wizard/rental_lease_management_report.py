@@ -153,7 +153,7 @@ class RentorLeaseManagementReport(models.TransientModel):
             {'font_size': 25, 'align': 'center'}
         )
         keys = workbook.add_format(
-            {'border': 1, 'font_size': '12px', 'align': 'left', 'bold': True})
+            {'border': 1, 'font_size': '12px', 'align': 'center', 'bold': True})
         cells = workbook.add_format(
             {'font_size': '12px', 'align': 'left','bold': True})
         txt = workbook.add_format({'font_size': '12px', 'align': 'left'})
@@ -163,7 +163,14 @@ class RentorLeaseManagementReport(models.TransientModel):
         sheet.merge_range('A9:B9', 'To Date:', cells)
         sheet.merge_range('C9:D9', data['to_date'], txt)
         border = workbook.add_format(
-            {'border': 1, 'font_size': '12px', 'align': 'left'})
+            {'border': 1, 'font_size': '12px', 'align': 'center'})
+        sheet.set_column('A:A',5)
+        sheet.set_column('B:B', 10)
+        sheet.set_column('C:C', 13)
+        sheet.set_column('D:D', 30)
+        sheet.set_column('E:E', 30)
+        sheet.set_column('F:F', 10)
+        sheet.set_column('G:G', 10)
         sheet.write(12, 0, 'Sl No',keys)
         row = 12
         col = 1
@@ -197,3 +204,4 @@ class RentorLeaseManagementReport(models.TransientModel):
         output.seek(0)
         response.stream.write(output.read())
         output.close()
+
