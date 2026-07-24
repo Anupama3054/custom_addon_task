@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="combined_invoice_payment" model="ir.ui.view">
+        <field name="name">combined_invoice_payment</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Invoices">
+                    <field name="table_ids">
+                        <list editable="bottom">
+                            <field name="invoice_id" domain="[('id', 'in', inv_ids)]"/>
+                            <field name="amount"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

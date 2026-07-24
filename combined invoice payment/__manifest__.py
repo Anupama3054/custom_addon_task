@@ -13,6 +13,7 @@
     'auto_install': True,
     'depends': ['base','account'],
     'data': [
-
+        'security/ir.model.access.csv',
+        'views/account_payment_views.xml',
     ]
 }
